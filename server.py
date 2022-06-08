@@ -1,8 +1,10 @@
 # Citation for the following program:
-# Date: 4/17/2022
+# Date: 6/7/2022
 # Based on TCPServer.py from chapter 2.7.2 of the book Computer Networking: A Top-Down Approach
-# Modified from my implementation of simple_server.py from the A1
 # Authors: Jim Kurose, Keith Ross
+# Modified from my implementation of simple_server.py from A1
+# Additional sources: https://www.tutorialkart.com/python/how-to-find-length-of-bytes-in-python/ for length of bytes
+# https://docs.python.org/3.4/howto/sockets.html for more information on connecting and closing sockets
 
 # Usage: custom port number entry at the CLI
 # Source: https://www.tutorialspoint.com/python/python_command_line_arguments.htm
@@ -10,9 +12,13 @@ from sys import argv
 from socket import *
 
 HOST = 'localhost'
+SIZE = 2048
 
 
 class ChatServer:
+    """
+    Implementation of a chat server object. Not used.
+    """
     def __init__(self, port=1238):
         self._server_socket = None
         self._connection_socket = None
@@ -39,7 +45,7 @@ class ChatServer:
             message = ""
 
             # 3. When connected, the server calls recv to receive data
-            message = self._connection_socket.recv(1024)
+            message = self._connection_socket.recv(SIZE)
             if len(message) == 0:
                 return self.close_connections()
 
@@ -79,10 +85,10 @@ def main(port=1238):
 
     # 7. Back to step 3
     while True:
-        message = ""
-
         # 3. When connected, the server calls recv to receive data
-        message = connection_socket.recv(1024)
+        message = connection_socket.recv(SIZE)
+
+        # If the connection was closed by the client, the length of the message will be 0
         if len(message) == 0:
             break
 
@@ -106,6 +112,7 @@ def main(port=1238):
     server_socket.close()
 
 
+# Runs the program with an optionally selected port
 if len(argv) == 2:
     main(int(argv[1]))
 else:

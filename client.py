@@ -1,9 +1,10 @@
 # Citation for the following program:
 # Date: 6/7/2022
 # Based on TCPClient.py from chapter 2.7.2 of the book Computer Networking: A Top-Down Approach
-# Modified from my simple_client.py implementation from the first programming assignment
 # Authors: Jim Kurose, Keith Ross
+# Modified from my simple_client.py implementation from A1
 # Additional sources: https://www.tutorialkart.com/python/how-to-find-length-of-bytes-in-python/ for length of bytes
+# https://docs.python.org/3.4/howto/sockets.html for more information on connecting and closing sockets
 
 # Usage: custom port number entry at the CLI
 # Source: https://www.tutorialspoint.com/python/python_command_line_arguments.htm
@@ -11,9 +12,13 @@ from sys import argv
 from socket import *
 
 HOST = 'localhost'
+SIZE = 2048
 
 
 class ChatClient:
+    """
+    Implementation of a chat client object. Not used.
+    """
     def __init__(self, port=1238):
         self._client_socket = None
 
@@ -46,7 +51,7 @@ class ChatClient:
             self._client_socket.send(message.encode())
 
             # 5. The client calls recv to receive data
-            reply = self._client_socket.recv(1024)
+            reply = self._client_socket.recv(SIZE)
             if len(reply) == 0:
                 break
 
@@ -89,7 +94,9 @@ def main(port=1238):
         client_socket.send(message.encode())
 
         # 5. The client calls recv to receive data
-        reply = client_socket.recv(1024)
+        reply = client_socket.recv(SIZE)
+
+        # If the connection was closed by the server, the length will be 0
         if len(reply) == 0:
             break
 
@@ -100,6 +107,7 @@ def main(port=1238):
     client_socket.close()
 
 
+# Runs the program with an optionally selected port
 if len(argv) == 2:
     main(int(argv[1]))
 else:
