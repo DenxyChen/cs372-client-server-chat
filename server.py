@@ -1,42 +1,49 @@
 # Citation for the following program:
 # Date: 4/17/2022
 # Based on TCPServer.py from chapter 2.7.2 of the book Computer Networking: A Top-Down Approach
-# Modified from my implementation of simple_server.py from the first programming assignment
+# Modified from my implementation of simple_server.py from the A1
 # Authors: Jim Kurose, Keith Ross
 
 from socket import *
 
-# Source host and port required for connection
+# 1. The server creates a socket and binds to 'localhost' and port xxxx
 host = "localhost"
 port = 5000
 source = (host, port)
 
-# Establish TCP server socket which awaits a client connection
 server_socket = socket(AF_INET, SOCK_STREAM)
 server_socket.bind(source)
+
+# 2. The server then listens for a connection
 server_socket.listen(1)
+print("Server listening on: {} on port: {}".format(host, port))
 
-# HTTP data to be sent to client
-response = ""
+connection_socket, addr = server_socket.accept()
+print("Connected by: {}".format(source))
+print("Waiting for message...")
 
+# 7. Back to step 3
 while True:
-    # Handshakes with the client by establishing a TCP connection with a dedicated socket
-    connection_socket, addr = server_socket.accept()
-    print("Connected by: {}".format(source))
+    # 3. When connected, the server calls recv to receive data
+    message = connection_socket.recv(1024)
+    if len(message) == 0:
+        break
 
-    # Receives an HTTP request from the client
-    request = connection_socket.recv(1024)
-    print("\nRecieved: {}".format(request))
-
+    # 4. The server prints the data, then prompts for a reply
+    print(message.decode())
+    print("Type /q to quit")
     print("Enter message to send ...")
-    response = input(">")
+    reply = input(">")
 
-    # Encodes the HTML into bytes and sends it to the client in response
-    print("\nSending >>>>>>>>>>\n{}".format(response))
-    connection_socket.send(response.encode())
-    print("<<<<<<<<<<")
+    # 5. If the reply is /q, the server quits
+    if reply == "/q":
+        break
 
-    # Close the dedicated connection once all data has been sent
-    connection_socket.close()
+    # 6. Otherwise the server sends the reply
+    connection_socket.send(reply.encode())
+
+# 8. Sockets are closed
+connection_socket.close()
+server_socket.close()
 
 
