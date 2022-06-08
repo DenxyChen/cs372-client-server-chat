@@ -22,32 +22,19 @@ class ChatServer:
         self.accept_connection()
 
     def bind_server_socket(self, port):
-        """
-        1. The server creates a socket and binds to 'localhost' and port xxxx
-        """
         self._server_socket = socket(AF_INET, SOCK_STREAM)
         self._server_socket.bind((HOST, port))
 
     def set_listen(self, port):
-        """
-        2. The server then listens for a connection
-        """
         self._server_socket.listen(1)
         print("Server listening on: {} on port: {}".format(HOST, port))
 
     def accept_connection(self):
-        """
-        2.5. The server accepts the connection
-        """
         self._connection_socket, addr = self._server_socket.accept()
         print("Connected by: {}".format(addr))
         print("Waiting for message...")
 
     def run(self):
-        """
-        7. Back to step 3
-        Handles the recv/input/send loop
-        """
         while True:
             message = ""
 
@@ -70,19 +57,56 @@ class ChatServer:
             self._connection_socket.send(reply.encode())
 
     def close_connections(self):
-        """
-        Sockets are closed
-        """
         self._connection_socket.close()
         self._server_socket.close()
 
 
-def main():
-    if len(argv) == 2:
-        chat_server = ChatServer(int(argv[1]))
-    else:
-        chat_server = ChatServer()
-    chat_server.run()
+def main(port=1238):
+    handshake = True
+
+    # 1. The server creates a socket and binds to 'localhost' and port xxxx
+    source = (HOST, port)
+    server_socket = socket(AF_INET, SOCK_STREAM)
+    server_socket.bind(source)
+
+    # 2. The server then listens for a connection
+    server_socket.listen(1)
+    print("Server listening on: {} on port: {}".format(HOST, port))
+
+    connection_socket, addr = server_socket.accept()
+    print("Connected by: {}".format(addr))
+    print("Waiting for message...")
+
+    # 7. Back to step 3
+    while True:
+        message = ""
+
+        # 3. When connected, the server calls recv to receive data
+        message = connection_socket.recv(1024)
+        if len(message) == 0:
+            break
+
+        # 4. The server prints the data, then prompts for a reply
+        print(message.decode())
+        if handshake:
+            print("Type /q to quit")
+            print("Enter message to send ...")
+            handshake = False
+        reply = input(">")
+
+        # 5. If the reply is /q, the server quits
+        if reply == "/q":
+            break
+
+        # 6. Otherwise the server sends the reply
+        connection_socket.send(reply.encode())
+
+    # 8. Sockets are closed
+    connection_socket.close()
+    server_socket.close()
 
 
-main()
+if len(argv) == 2:
+    main(int(argv[1]))
+else:
+    main()

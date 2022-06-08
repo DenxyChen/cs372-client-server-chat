@@ -1,38 +1,98 @@
 # Citation for the following program:
-# Date: 4/17/2022
+# Date: 6/7/2022
 # Based on TCPClient.py from chapter 2.7.2 of the book Computer Networking: A Top-Down Approach
 # Modified from my simple_client.py implementation from the first programming assignment
 # Authors: Jim Kurose, Keith Ross
 # Additional sources: https://www.tutorialkart.com/python/how-to-find-length-of-bytes-in-python/ for length of bytes
 
+# Usage: custom port number entry at the CLI
+# Source: https://www.tutorialspoint.com/python/python_command_line_arguments.htm
+from sys import argv
 from socket import *
 
-# Target host and port required for connection
-host = "localhost"
-port = 5000
+HOST = 'localhost'
 
-print("Connected to: {} on port: {}".format(host, port))
-print("Type \q to quit")
 
-# Establish TCP client socket and establish a connection with the server
-client_socket = socket(AF_INET, SOCK_STREAM)
-client_socket.connect((host, port))
+class ChatClient:
+    def __init__(self, port=1238):
+        self._client_socket = None
 
-# Send the UTF-8 encoded request string
-print("Enter a message to send...")
-request = ""
+        self.connect_to_server(port)
 
-while True:
-    client_socket.send(request.encode())
-    request = input(">")
+    def connect_to_server(self, port):
+        """
+        1. The client creates a socket and connects to 'localhost' and port xxxx
+        """
+        self._client_socket = socket(AF_INET, SOCK_STREAM)
+        self._client_socket.connect((HOST, port))
+        print("Connected to: {} on port: {}".format(HOST, port))
+        print("Type \q to quit")
+        print("Enter a message to send...")
 
-    if request == "\q":
-        break
+    def run(self):
+        """
+        7. Back to step 2
+        Handles the input/send/recv/print loop
+        """
+        while True:
+            # 2. When connected, the client prompts for a message to send
+            message = input(">")
 
-    # Read up to 1024 bytes of the response and display the decoded string and its length
-    response = client_socket.recv(1024)
-    print("[RECV] - length: {}".format(len(response)))
-    print(response.decode())
+            # 3. If the message is /q, the client quits
+            if message == "/q":
+                break
 
-# Close the client-server connection
-client_socket.close()
+            # 4. Otherwise, the client sends the message
+            self._client_socket.send(message.encode())
+
+            # 5. The client calls recv to receive data
+            reply = self._client_socket.recv(1024)
+            if len(reply) == 0:
+                break
+
+            # 6. The client prints the data
+            print(reply.decode())
+
+    def close_connection(self):
+        self._client_socket.close()
+
+
+def main(port=1238):
+    # 1. The client creates a socket and connects to 'localhost' and port xxxx
+    source = (HOST, port)
+
+    client_socket = socket(AF_INET, SOCK_STREAM)
+    client_socket.connect(source)
+
+    print("Connected to: {} on port: {}".format(HOST, port))
+    print("Type \q to quit")
+    print("Enter a message to send...")
+
+    # 7. Back to step 2
+    while True:
+        # 2. When connected, the client prompts for a message to send
+        message = input(">")
+
+        # 3. If the message is /q, the client quits
+        if message == "/q":
+            break
+
+        # 4. Otherwise, the client sends the message
+        client_socket.send(message.encode())
+
+        # 5. The client calls recv to receive data
+        reply = client_socket.recv(1024)
+        if len(reply) == 0:
+            break
+
+        # 6. The client prints the data
+        print(reply.decode())
+
+    # 8. Sockets are closed
+    client_socket.close()
+
+
+if len(argv) == 2:
+    main(int(argv[1]))
+else:
+    main()
