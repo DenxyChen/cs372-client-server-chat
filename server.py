@@ -6,6 +6,10 @@
 
 from socket import *
 
+class ChatServer:
+    def __init__(self):
+        self._server_socket = None
+        self._
 
 def main():
     # 1. The server creates a socket and binds to 'localhost' and port xxxx
@@ -21,7 +25,7 @@ def main():
     print("Server listening on: {} on port: {}".format(host, port))
 
     connection_socket, addr = server_socket.accept()
-    print("Connected by: {}".format(source))
+    print("Connected by: {}".format(addr))
     print("Waiting for message...")
 
     # 7. Back to step 3
@@ -49,3 +53,6 @@ def main():
     # 8. Sockets are closed
     connection_socket.close()
     server_socket.close()
+
+
+main()
