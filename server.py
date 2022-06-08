@@ -6,44 +6,46 @@
 
 from socket import *
 
-# 1. The server creates a socket and binds to 'localhost' and port xxxx
-host = "localhost"
-port = 5000
-source = (host, port)
 
-server_socket = socket(AF_INET, SOCK_STREAM)
-server_socket.bind(source)
+def main():
+    # 1. The server creates a socket and binds to 'localhost' and port xxxx
+    host = "localhost"
+    port = 5000
+    source = (host, port)
 
-# 2. The server then listens for a connection
-server_socket.listen(1)
-print("Server listening on: {} on port: {}".format(host, port))
+    server_socket = socket(AF_INET, SOCK_STREAM)
+    server_socket.bind(source)
 
-connection_socket, addr = server_socket.accept()
-print("Connected by: {}".format(source))
-print("Waiting for message...")
+    # 2. The server then listens for a connection
+    server_socket.listen(1)
+    print("Server listening on: {} on port: {}".format(host, port))
 
-# 7. Back to step 3
-while True:
-    # 3. When connected, the server calls recv to receive data
-    message = connection_socket.recv(1024)
-    if len(message) == 0:
-        break
+    connection_socket, addr = server_socket.accept()
+    print("Connected by: {}".format(source))
+    print("Waiting for message...")
 
-    # 4. The server prints the data, then prompts for a reply
-    print(message.decode())
-    print("Type /q to quit")
-    print("Enter message to send ...")
-    reply = input(">")
+    # 7. Back to step 3
+    while True:
+        message = ""
 
-    # 5. If the reply is /q, the server quits
-    if reply == "/q":
-        break
+        # 3. When connected, the server calls recv to receive data
+        message = connection_socket.recv(1024)
+        if len(message) == 0:
+            break
 
-    # 6. Otherwise the server sends the reply
-    connection_socket.send(reply.encode())
+        # 4. The server prints the data, then prompts for a reply
+        print(message.decode())
+        print("Type /q to quit")
+        print("Enter message to send ...")
+        reply = input(">")
 
-# 8. Sockets are closed
-connection_socket.close()
-server_socket.close()
+        # 5. If the reply is /q, the server quits
+        if reply == "/q":
+            break
 
+        # 6. Otherwise the server sends the reply
+        connection_socket.send(reply.encode())
 
+    # 8. Sockets are closed
+    connection_socket.close()
+    server_socket.close()
