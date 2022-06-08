@@ -62,7 +62,15 @@ def main(port=1238):
     source = (HOST, port)
 
     client_socket = socket(AF_INET, SOCK_STREAM)
-    client_socket.connect(source)
+
+    # Usage: error handling
+    # https://stackoverflow.com/questions/1483429/how-to-print-an-exception-in-python
+    try:
+        client_socket.connect(source)
+    except ConnectionRefusedError as e:
+        print("client.py: {} on port {} is not an active server".format(HOST, port))
+        print(e)
+        return
 
     print("Connected to: {} on port: {}".format(HOST, port))
     print("Type \q to quit")
